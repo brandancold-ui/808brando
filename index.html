@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#080808" />
+    <meta name="description" content="Enter the world of 808 Brando. Explore upcoming projects, preview new music, watch official videos, and find booking information." />
+    <meta property="og:title" content="808 Brando — Upcoming Projects" />
+    <meta property="og:description" content="Upcoming music and official releases from 808 Brando." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>808 Brando — Upcoming Projects</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header" id="top">
+      <a class="wordmark" href="#home" aria-label="808 Brando home">808<span>BRANDO</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Open menu</span><span></span><span></span></button>
+      <nav class="site-nav" id="site-nav" aria-label="Primary navigation"><a href="#projects">Projects</a><a href="#videos">Videos</a><a href="#connect">Connect</a><a href="#contact">Contact</a></nav>
+    </header>
+    <main id="main">
+      <section class="hero" id="home" aria-labelledby="hero-title">
+        <div class="hero-media" aria-hidden="true"></div><div class="hero-shade" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow">Official artist site · New music incoming</p>
+          <h1 id="hero-title"><span>808</span> Brando</h1>
+          <div class="hero-foot"><p>Built in the dark.<br />Made to live forever.</p><a href="#projects">Enter the projects <span aria-hidden="true">↓</span></a></div>
+        </div>
+      </section>
+      <section class="primary-art" aria-labelledby="primary-art-title">
+        <div class="primary-art-head"><div><p class="section-label"><span>01</span> The first image</p><h2 id="primary-art-title">At the center.</h2></div></div>
+        <figure class="primary-art-frame reveal"><img src="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" alt="808 Brando artwork featuring the artist and his mother" /></figure>
+        <p class="primary-art-note">Official project details will be added when announced.</p>
+      </section>
+      <section class="project-showcase" id="projects" aria-labelledby="projects-title">
+        <div class="showcase-head">
+          <div><p class="section-label"><span>02</span> Upcoming worlds</p><h2 id="projects-title">The projects</h2></div>
+          <div class="rail-controls" aria-label="Project carousel controls"><button class="rail-button" id="project-prev" type="button" aria-label="Previous project">←</button><span id="rail-count">01 / 05</span><button class="rail-button" id="project-next" type="button" aria-label="Next project">→</button></div>
+        </div>
+        <div class="project-rail" id="project-rail" aria-label="Upcoming projects"></div>
+        <p class="swipe-hint"><span aria-hidden="true">↔</span> Swipe to explore</p>
+      </section>
+      <section class="manifesto" aria-label="Artist statement"><p class="section-label"><span>02</span> The signal</p><p class="manifesto-copy reveal">Every cover is a door.<br /><em>Every track is another room.</em></p></section>
+      <section class="section videos" id="videos" aria-labelledby="videos-title">
+        <div class="section-head reveal"><p class="section-label"><span>03</span> Visuals</p><h2 id="videos-title">Official videos</h2></div>
+        <div class="video-grid" id="video-grid"></div>
+        <a class="text-link reveal" href="https://youtube.com/" target="_blank" rel="noopener">Visit YouTube <span aria-hidden="true">↗</span></a>
+      </section>
+      <section class="marquee" aria-label="808 Brando"><div><span>808 Brando</span><i>New worlds loading</i><span>808 Brando</span><i>New worlds loading</i></div></section>
+      <section class="section connect" id="connect" aria-labelledby="connect-title">
+        <div class="connect-grid"><div class="reveal"><p class="section-label"><span>04</span> Stay close</p><h2 id="connect-title">Follow<br />the signal.</h2></div><div class="social-list reveal" id="social-list"></div></div>
+      </section>
+      <section class="section contact" id="contact" aria-labelledby="contact-title">
+        <div class="contact-inner reveal"><p class="eyebrow">Business · Features · Bookings</p><h2 id="contact-title">Let’s work.</h2><p>For serious business inquiries, feature requests, press, and live bookings.</p><a class="contact-email" href="mailto:booking@808brando.com">booking@808brando.com <span aria-hidden="true">↗</span></a><p class="placeholder-note">Placeholder email — replace with your preferred public business address.</p></div>
+      </section>
+    </main>
+    <footer class="site-footer"><a class="footer-mark" href="#top">808<br /><span>Brando</span></a><div class="footer-meta"><p>Official artist website</p><p>© <span id="year"></span> 808 Brando. All rights reserved.</p></div><a class="back-top" href="#top">Back to top ↑</a></footer>
+    <dialog class="project-dialog" id="project-dialog" aria-labelledby="detail-title">
+      <button class="dialog-close" id="dialog-close" type="button" aria-label="Close project details">Close <span aria-hidden="true">×</span></button>
+      <div class="dialog-scroll"><div class="detail-layout"><div class="detail-art"><img id="detail-cover" src="" alt="" /></div><div class="detail-copy"><p class="detail-status" id="detail-status"></p><h2 id="detail-title"></h2><p class="detail-description" id="detail-description"></p><div class="detail-actions" id="detail-actions"></div><div class="tracklist-wrap"><div class="tracklist-head"><h3>Selected tracks</h3><span>Preview</span></div><ol class="tracklist" id="detail-tracklist"></ol></div></div></div></div>
+    </dialog>
+  </body>
+</html>
