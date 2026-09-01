@@ -22,8 +22,8 @@ const siteContent = {
     links: { appleMusic: "", spotify: "", youtube: "" }
   })),
   videos: [
-    { label: "Video 01", status: "Official link pending", url: "https://youtube.com/", image: "1DD79DA3-024E-472B-AC8B-D9D0BF4B50BC.jpeg" },
-    { label: "Video 02", status: "Official link pending", url: "https://youtube.com/", image: "55DD4A71-9E98-42A2-AFD6-0C087A4A21C6.png" }
+    { label: "Video 01", status: "Link pending", url: "", image: "1DD79DA3-024E-472B-AC8B-D9D0BF4B50BC.jpeg" },
+    { label: "Video 02", status: "Link pending", url: "", image: "55DD4A71-9E98-42A2-AFD6-0C087A4A21C6.png" }
   ],
   socials: [
     { name: "Instagram", handle: "@808brando", url: "https://instagram.com/" },
@@ -53,10 +53,10 @@ siteContent.projects.forEach((project, index) => {
     </button>
     <div class="project-meta">
       <h3>${project.title || projectLabel(index)}</h3>
-      <p class="project-status">${[project.status, project.releaseDate].filter(Boolean).join(" · ") || "Official details pending"}</p>
+      <p class="project-status">${[project.status, project.releaseDate].filter(Boolean).join(" · ") || "Information pending"}</p>
       <div class="project-actions">
         <button class="button button-primary view-project" type="button">View project <span aria-hidden="true">↗</span></button>
-        <button class="button button-outline card-preview" type="button" ${hasPreview ? "" : "disabled"}>${hasPreview ? "Play preview" : "Preview pending"}</button>
+        <button class="button button-outline card-preview" type="button" ${hasPreview ? "" : "disabled"}>${hasPreview ? "Play preview" : "Audio pending"}</button>
       </div>
     </div>`;
   const image = card.querySelector("img");
@@ -68,6 +68,16 @@ siteContent.projects.forEach((project, index) => {
 
 railCount.textContent = `01 / ${String(siteContent.projects.length).padStart(2, "0")}`;
 
+const previewList = document.querySelector("#preview-list");
+siteContent.projects.forEach((project, index) => {
+  const previewUrl = project.fullPreviewUrl || project.tracks.find(track => track.previewUrl)?.previewUrl || "";
+  const row = document.createElement("article");
+  row.className = "preview-row reveal";
+  row.innerHTML = `<img src="${project.cover}" alt="" loading="lazy"><div><h3>${project.title || projectLabel(index)}</h3><p>${previewUrl ? "Audio preview" : "Preview audio pending"}</p></div><button class="preview-play" type="button" ${previewUrl ? "" : "disabled"}>${previewUrl ? "Play" : "Pending"}</button>`;
+  if (previewUrl) row.querySelector("button").addEventListener("click", event => playAudio(previewUrl, event.currentTarget));
+  previewList.appendChild(row);
+});
+
 function openProject(project, index) {
   stopAudio();
   const cover = document.querySelector("#detail-cover");
@@ -75,8 +85,8 @@ function openProject(project, index) {
   cover.alt = `Cover artwork ${index + 1}`;
   cover.onerror = () => { cover.onerror = null; cover.src = fallbackCover; };
   document.querySelector("#detail-title").textContent = project.title || projectLabel(index);
-  document.querySelector("#detail-status").textContent = [project.status, project.releaseDate].filter(Boolean).join(" · ") || "Official details pending";
-  document.querySelector("#detail-description").textContent = project.description || "Project description will be added when official information is available.";
+  document.querySelector("#detail-status").textContent = [project.status, project.releaseDate].filter(Boolean).join(" · ") || "Information pending";
+  document.querySelector("#detail-description").textContent = project.description || "Description pending.";
 
   const actions = document.querySelector("#detail-actions");
   actions.replaceChildren();
@@ -94,7 +104,7 @@ function openProject(project, index) {
   const tracklist = document.querySelector("#detail-tracklist");
   tracklist.replaceChildren();
   if (!project.tracks.length) {
-    const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "Tracklist will be added when announced."; tracklist.appendChild(empty);
+    const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "Tracklist pending."; tracklist.appendChild(empty);
   } else {
     project.tracks.forEach((track, trackIndex) => {
       const item = document.createElement("li"); item.className = "track";
@@ -125,7 +135,11 @@ document.querySelector("#project-next").addEventListener("click", () => scrollRa
 rail.addEventListener("scroll", () => { const card = rail.querySelector(".project-card"); if (!card) return; const index = Math.min(siteContent.projects.length - 1, Math.max(0, Math.round(rail.scrollLeft / (card.offsetWidth + 24)))); railCount.textContent = `${String(index + 1).padStart(2, "0")} / ${String(siteContent.projects.length).padStart(2, "0")}`; }, { passive: true });
 
 const videoGrid = document.querySelector("#video-grid");
-siteContent.videos.forEach(video => videoGrid.insertAdjacentHTML("beforeend", `<a class="video-card reveal" href="${video.url}" target="_blank" rel="noopener"><img src="${video.image}" alt="Placeholder video still" loading="lazy"><div class="video-content"><span class="play" aria-hidden="true">▶</span><h3>${video.label}</h3><p>${video.status}</p></div></a>`));
+siteContent.videos.forEach(video => {
+  const tag = video.url ? "a" : "div";
+  const attrs = video.url ? ` href="${video.url}" target="_blank" rel="noopener"` : "";
+  videoGrid.insertAdjacentHTML("beforeend", `<${tag} class="video-card reveal"${attrs}><img src="${video.image}" alt="" loading="lazy"><div class="video-content"><span class="play" aria-hidden="true">${video.url ? "▶" : "—"}</span><h3>${video.label}</h3><p>${video.status}</p></div></${tag}>`);
+});
 const socialList = document.querySelector("#social-list");
 siteContent.socials.forEach(social => socialList.insertAdjacentHTML("beforeend", `<a class="social-link" href="${social.url}" target="_blank" rel="noopener"><div>${social.name}<small> · ${social.handle}</small></div><span aria-hidden="true">↗</span></a>`));
 document.querySelector("#year").textContent = new Date().getFullYear();
