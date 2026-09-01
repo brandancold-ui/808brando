@@ -1,152 +1,237 @@
 /*
-  808 BRANDO — PROJECT DATA
-  Add the six real image filenames to `cover`, then fill the empty fields only
-  when official information is available. No layout changes are required.
+  808 BRANDO — EDITABLE SITE DATA
+  Fill only confirmed information. Empty values render as neutral pending states.
+  Audio previews should be short files (15–30 seconds recommended).
 */
-const siteContent = {
-  projects: [
+const SITE_DATA = {
+  contactEmail: "", // Add the confirmed professional @808brando.com address.
+  signupUrl: "", // Add a future mailing-list form URL or endpoint.
+  primaryProject: {
+    title: "BRANDO",
+    cover: "4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png",
+    releaseDate: "",
+    tracks: [
+      // { number: 1, title: "", feature: "", previewUrl: "assets/audio/preview.mp3" }
+    ]
+  },
+  vault: [
+    // { title: "", status: "", image: "", previewUrl: "assets/audio/vault-preview.mp3" }
+  ],
+  upcoming: [
+    { title: "VII" },
+    { title: "DEAR LORD" },
+    { title: "Mr. Brown" },
+    { title: "Bathed in Blood" }
+  ],
+  coverConcepts: [
     "1DD79DA3-024E-472B-AC8B-D9D0BF4B50BC.jpeg",
     "55DD4A71-9E98-42A2-AFD6-0C087A4A21C6.png",
     "76090F60-4982-4AB9-B374-621A9DA31181.png",
     "BA1ACFBF-2406-4A67-9D00-0D025D99E1F7.png",
     "D1B7AF8A-D91B-43CA-BC2B-C20FFFDC2A6B.jpeg"
-  ].map((cover, index) => ({
-    id: `project-${String(index + 1).padStart(2, "0")}`,
-    cover,
-    title: "",
-    status: "",
-    releaseDate: "",
-    description: "",
-    fullPreviewUrl: "",
-    tracks: [], // Example later: { title: "Song title", previewUrl: "assets/audio/song-preview.mp3" }
-    links: { appleMusic: "", spotify: "", youtube: "" }
-  })),
-  videos: [
-    { label: "Video 01", status: "Link pending", url: "", image: "1DD79DA3-024E-472B-AC8B-D9D0BF4B50BC.jpeg" },
-    { label: "Video 02", status: "Link pending", url: "", image: "55DD4A71-9E98-42A2-AFD6-0C087A4A21C6.png" }
   ],
-  socials: [
-    { name: "Instagram", handle: "@808brando", url: "https://instagram.com/" },
-    { name: "TikTok", handle: "@808brando", url: "https://tiktok.com/" },
-    { name: "YouTube", handle: "808 Brando", url: "https://youtube.com/" },
-    { name: "X / Twitter", handle: "@808brando", url: "https://x.com/" }
+  releases: [
+    // { title: "", cover: "", links: { appleMusic: "", spotify: "", youtube: "", other: "" } }
+  ],
+  beats: [
+    // {
+    //   title: "", previewUrl: "", bpm: "", key: "", moods: [], price: "",
+    //   licenses: [{ name: "", price: "", buyUrl: "" }], exclusiveContact: true
+    // }
   ]
 };
 
-const fallbackCover = "1DD79DA3-024E-472B-AC8B-D9D0BF4B50BC.jpeg";
-const rail = document.querySelector("#project-rail");
-const dialog = document.querySelector("#project-dialog");
-const railCount = document.querySelector("#rail-count");
-let currentAudio = null;
-let currentButton = null;
+const page = document.body.dataset.page;
+let activeAudio = null;
+let activeButton = null;
 
-const projectLabel = index => `Project ${String(index + 1).padStart(2, "0")}`;
-
-siteContent.projects.forEach((project, index) => {
-  const hasPreview = Boolean(project.fullPreviewUrl || project.tracks.some(track => track.previewUrl));
-  const card = document.createElement("article");
-  card.className = "project-card reveal";
-  card.innerHTML = `
-    <button class="project-cover" type="button" aria-label="Open details for ${projectLabel(index)}">
-      <img src="${project.cover}" alt="Cover artwork ${index + 1}" width="1200" height="1200" ${index ? 'loading="lazy"' : ""} />
-      <span class="project-index">${String(index + 1).padStart(2, "0")}</span>
-    </button>
-    <div class="project-meta">
-      <h3>${project.title || projectLabel(index)}</h3>
-      <p class="project-status">${[project.status, project.releaseDate].filter(Boolean).join(" · ") || "Information pending"}</p>
-      <div class="project-actions">
-        <button class="button button-primary view-project" type="button">View project <span aria-hidden="true">↗</span></button>
-        <button class="button button-outline card-preview" type="button" ${hasPreview ? "" : "disabled"}>${hasPreview ? "Play preview" : "Audio pending"}</button>
-      </div>
-    </div>`;
-  const image = card.querySelector("img");
-  image.addEventListener("error", () => { image.src = fallbackCover; }, { once: true });
-  card.querySelectorAll(".project-cover,.view-project").forEach(button => button.addEventListener("click", () => openProject(project, index)));
-  if (hasPreview) card.querySelector(".card-preview").addEventListener("click", event => playAudio(project.fullPreviewUrl || project.tracks.find(track => track.previewUrl).previewUrl, event.currentTarget));
-  rail.appendChild(card);
-});
-
-railCount.textContent = `01 / ${String(siteContent.projects.length).padStart(2, "0")}`;
-
-const previewList = document.querySelector("#preview-list");
-siteContent.projects.forEach((project, index) => {
-  const previewUrl = project.fullPreviewUrl || project.tracks.find(track => track.previewUrl)?.previewUrl || "";
-  const row = document.createElement("article");
-  row.className = "preview-row reveal";
-  row.innerHTML = `<img src="${project.cover}" alt="" loading="lazy"><div><h3>${project.title || projectLabel(index)}</h3><p>${previewUrl ? "Audio preview" : "Preview audio pending"}</p></div><button class="preview-play" type="button" ${previewUrl ? "" : "disabled"}>${previewUrl ? "Play" : "Pending"}</button>`;
-  if (previewUrl) row.querySelector("button").addEventListener("click", event => playAudio(previewUrl, event.currentTarget));
-  previewList.appendChild(row);
-});
-
-function openProject(project, index) {
-  stopAudio();
-  const cover = document.querySelector("#detail-cover");
-  cover.src = project.cover;
-  cover.alt = `Cover artwork ${index + 1}`;
-  cover.onerror = () => { cover.onerror = null; cover.src = fallbackCover; };
-  document.querySelector("#detail-title").textContent = project.title || projectLabel(index);
-  document.querySelector("#detail-status").textContent = [project.status, project.releaseDate].filter(Boolean).join(" · ") || "Information pending";
-  document.querySelector("#detail-description").textContent = project.description || "Description pending.";
-
-  const actions = document.querySelector("#detail-actions");
-  actions.replaceChildren();
-  if (project.fullPreviewUrl) actions.appendChild(makeAction("Play project preview", () => playAudio(project.fullPreviewUrl)));
-  Object.entries(project.links).forEach(([service, url]) => {
-    const label = service === "appleMusic" ? "Apple Music" : service[0].toUpperCase() + service.slice(1);
-    const element = document.createElement(url ? "a" : "button");
-    element.className = url ? "button button-primary" : "button button-outline";
-    element.textContent = url ? label : `${label} · Pending`;
-    if (url) { element.href = url; element.target = "_blank"; element.rel = "noopener"; }
-    else { element.type = "button"; element.disabled = true; }
-    actions.appendChild(element);
-  });
-
-  const tracklist = document.querySelector("#detail-tracklist");
-  tracklist.replaceChildren();
-  if (!project.tracks.length) {
-    const empty = document.createElement("li"); empty.className = "empty-state"; empty.textContent = "Tracklist pending."; tracklist.appendChild(empty);
-  } else {
-    project.tracks.forEach((track, trackIndex) => {
-      const item = document.createElement("li"); item.className = "track";
-      item.innerHTML = `<span>${String(trackIndex + 1).padStart(2, "0")}</span><span>${track.title}</span><button class="preview-button" type="button" ${track.previewUrl ? "" : "disabled"}>${track.previewUrl ? "Play preview" : "Preview pending"}</button>`;
-      if (track.previewUrl) item.querySelector("button").addEventListener("click", event => playAudio(track.previewUrl, event.currentTarget));
-      tracklist.appendChild(item);
-    });
-  }
-  dialog.showModal(); document.body.classList.add("dialog-open");
+function stopAudio() {
+  if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; }
+  if (activeButton) activeButton.textContent = activeButton.dataset.idle || "Play";
+  activeAudio = null;
+  activeButton = null;
 }
 
-function makeAction(label, handler) { const button = document.createElement("button"); button.className = "button button-primary"; button.type = "button"; button.textContent = label; button.addEventListener("click", handler); return button; }
-function playAudio(url, button) {
+function playPreview(url, button) {
   if (!url) return;
-  stopAudio(); currentAudio = new Audio(url); currentButton = button || null;
-  if (currentButton) currentButton.textContent = "Pause preview";
-  currentAudio.play().catch(() => { if (currentButton) currentButton.textContent = "Preview unavailable"; });
-  currentAudio.addEventListener("ended", stopAudio, { once: true });
+  if (activeButton === button && activeAudio && !activeAudio.paused) { stopAudio(); return; }
+  stopAudio();
+  activeAudio = new Audio(url);
+  activeButton = button;
+  button.dataset.idle = button.textContent;
+  button.textContent = "Pause";
+  activeAudio.addEventListener("timeupdate", () => { if (activeAudio && activeAudio.currentTime >= 30) stopAudio(); });
+  activeAudio.addEventListener("ended", stopAudio, { once: true });
+  activeAudio.play().catch(() => { button.textContent = "Unavailable"; activeAudio = null; activeButton = null; });
 }
-function stopAudio() { if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; } if (currentButton) currentButton.textContent = "Play preview"; currentAudio = null; currentButton = null; }
-function closeProject() { stopAudio(); dialog.close(); document.body.classList.remove("dialog-open"); }
-document.querySelector("#dialog-close").addEventListener("click", closeProject);
-dialog.addEventListener("click", event => { if (event.target === dialog) closeProject(); });
 
-const scrollRail = direction => { const card = rail.querySelector(".project-card"); if (card) rail.scrollBy({ left: direction * (card.offsetWidth + 24), behavior: "smooth" }); };
-document.querySelector("#project-prev").addEventListener("click", () => scrollRail(-1));
-document.querySelector("#project-next").addEventListener("click", () => scrollRail(1));
-rail.addEventListener("scroll", () => { const card = rail.querySelector(".project-card"); if (!card) return; const index = Math.min(siteContent.projects.length - 1, Math.max(0, Math.round(rail.scrollLeft / (card.offsetWidth + 24)))); railCount.textContent = `${String(index + 1).padStart(2, "0")} / ${String(siteContent.projects.length).padStart(2, "0")}`; }, { passive: true });
+function audioButton(url, label = "Play") {
+  const button = document.createElement("button");
+  button.className = "audio-button";
+  button.type = "button";
+  button.textContent = url ? label : "Pending";
+  button.disabled = !url;
+  if (url) button.addEventListener("click", () => playPreview(url, button));
+  return button;
+}
 
-const videoGrid = document.querySelector("#video-grid");
-siteContent.videos.forEach(video => {
-  const tag = video.url ? "a" : "div";
-  const attrs = video.url ? ` href="${video.url}" target="_blank" rel="noopener"` : "";
-  videoGrid.insertAdjacentHTML("beforeend", `<${tag} class="video-card reveal"${attrs}><img src="${video.image}" alt="" loading="lazy"><div class="video-content"><span class="play" aria-hidden="true">${video.url ? "▶" : "—"}</span><h3>${video.label}</h3><p>${video.status}</p></div></${tag}>`);
-});
-const socialList = document.querySelector("#social-list");
-siteContent.socials.forEach(social => socialList.insertAdjacentHTML("beforeend", `<a class="social-link" href="${social.url}" target="_blank" rel="noopener"><div>${social.name}<small> · ${social.handle}</small></div><span aria-hidden="true">↗</span></a>`));
-document.querySelector("#year").textContent = new Date().getFullYear();
+function emptyState(text, className = "empty-state") {
+  const element = document.createElement("div");
+  element.className = className;
+  element.textContent = text;
+  return element;
+}
 
-const menuButton = document.querySelector(".menu-toggle"); const menu = document.querySelector(".site-nav");
-const closeMenu = () => { menuButton.setAttribute("aria-expanded","false"); menu.classList.remove("open"); document.body.classList.remove("menu-open"); };
-menuButton.addEventListener("click", () => { const opening = menuButton.getAttribute("aria-expanded") !== "true"; menuButton.setAttribute("aria-expanded",String(opening)); menu.classList.toggle("open",opening); document.body.classList.toggle("menu-open",opening); });
-menu.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu)); document.addEventListener("keydown", event => { if (event.key === "Escape") closeMenu(); });
-const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } }), { threshold:.1 });
-document.querySelectorAll(".reveal").forEach(element => observer.observe(element));
+function renderTracklist() {
+  const list = document.querySelector("#brando-tracklist");
+  if (!list) return;
+  const tracks = SITE_DATA.primaryProject.tracks;
+  if (!tracks.length) {
+    const item = document.createElement("li");
+    item.className = "track-row placeholder-row";
+    item.innerHTML = "<span>—</span><div><strong>Tracklist pending</strong><small>Titles and previews will be added when confirmed.</small></div>";
+    item.appendChild(audioButton(""));
+    list.appendChild(item);
+    return;
+  }
+  tracks.forEach((track, index) => {
+    const item = document.createElement("li");
+    item.className = "track-row";
+    const details = document.createElement("div");
+    details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
+    item.innerHTML = `<span>${String(track.number || index + 1).padStart(2, "0")}</span>`;
+    item.append(details, audioButton(track.previewUrl || ""));
+    list.appendChild(item);
+  });
+}
+
+function renderVault() {
+  const list = document.querySelector("#vault-list");
+  if (!list) return;
+  if (!SITE_DATA.vault.length) { list.appendChild(emptyState("Vault entries pending.")); return; }
+  SITE_DATA.vault.forEach((entry, index) => {
+    const item = document.createElement("article");
+    item.className = "vault-row reveal";
+    if (entry.image) item.innerHTML = `<img src="${entry.image}" alt="">`;
+    const info = document.createElement("div");
+    info.innerHTML = `<span>${String(index + 1).padStart(2, "0")}</span><h3>${entry.title || "Title pending"}</h3><p>${entry.status || "Unreleased"}</p>`;
+    item.append(info, audioButton(entry.previewUrl || "", "Play snippet"));
+    list.appendChild(item);
+  });
+}
+
+function renderUpcoming() {
+  const grid = document.querySelector("#upcoming-grid");
+  const rail = document.querySelector("#concept-rail");
+  if (!grid || !rail) return;
+  SITE_DATA.upcoming.forEach((project, index) => grid.insertAdjacentHTML("beforeend", `<article class="upcoming-card reveal"><span>${String(index + 1).padStart(2, "0")}</span><h3>${project.title}</h3><p>Details pending</p></article>`));
+  SITE_DATA.coverConcepts.forEach((cover, index) => rail.insertAdjacentHTML("beforeend", `<figure><img src="${cover}" alt="Unassigned cover concept ${index + 1}" loading="lazy"><figcaption>Concept ${String(index + 1).padStart(2, "0")}</figcaption></figure>`));
+}
+
+function platformLabel(key) {
+  return { appleMusic: "Apple Music", spotify: "Spotify", youtube: "YouTube", other: "More" }[key] || key;
+}
+
+function renderReleases() {
+  const grid = document.querySelector("#release-grid");
+  if (!grid) return;
+  if (!SITE_DATA.releases.length) { grid.appendChild(emptyState("Official releases and listening links pending.")); return; }
+  SITE_DATA.releases.forEach(release => {
+    const item = document.createElement("article");
+    item.className = "release-card reveal";
+    item.innerHTML = `<img src="${release.cover}" alt="${release.title || "Release"} cover artwork"><h3>${release.title || "Title pending"}</h3>`;
+    const links = document.createElement("div");
+    links.className = "stream-links";
+    Object.entries(release.links || {}).filter(([, url]) => url).forEach(([service, url]) => links.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener">${platformLabel(service)} ↗</a>`));
+    item.appendChild(links);
+    grid.appendChild(item);
+  });
+}
+
+function beatRow(beat) {
+  const item = document.createElement("article");
+  item.className = "beat-row reveal";
+  item.dataset.search = `${beat.title || ""} ${(beat.moods || []).join(" ")}`.toLowerCase();
+  item.dataset.moods = (beat.moods || []).join("|");
+  const info = document.createElement("div");
+  info.className = "beat-title";
+  info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${(beat.moods || []).join(" · ") || "Tags pending"}</p>`;
+  item.append(info);
+  [beat.bpm || "—", beat.key || "—", beat.price || "—"].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
+  item.appendChild(audioButton(beat.previewUrl || ""));
+  if ((beat.licenses || []).length || beat.exclusiveContact) {
+    const actions = document.createElement("div");
+    actions.className = "beat-actions";
+    (beat.licenses || []).forEach(license => { const link = document.createElement("a"); link.href = license.buyUrl || "#"; link.textContent = `${license.name}${license.price ? ` · ${license.price}` : ""}`; if (!license.buyUrl) link.setAttribute("aria-disabled", "true"); actions.appendChild(link); });
+    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", '<a href="index.html#contact">Exclusive inquiry</a>');
+    item.appendChild(actions);
+  }
+  return item;
+}
+
+function renderBeatPreview() {
+  const target = document.querySelector("#beats-preview");
+  if (!target) return;
+  if (!SITE_DATA.beats.length) { target.appendChild(emptyState("Beat inventory pending.", "beats-empty")); return; }
+  SITE_DATA.beats.slice(0, 3).forEach(beat => target.appendChild(beatRow(beat)));
+}
+
+function renderBeatStore() {
+  const list = document.querySelector("#beat-list");
+  if (!list) return;
+  if (!SITE_DATA.beats.length) list.appendChild(emptyState("Beat inventory pending."));
+  else SITE_DATA.beats.forEach(beat => list.appendChild(beatRow(beat)));
+  const moods = [...new Set(SITE_DATA.beats.flatMap(beat => beat.moods || []))].sort();
+  const moodSelect = document.querySelector("#beat-mood");
+  moods.forEach(mood => moodSelect.insertAdjacentHTML("beforeend", `<option value="${mood}">${mood}</option>`));
+  const applyFilters = () => {
+    const term = document.querySelector("#beat-search").value.trim().toLowerCase();
+    const mood = moodSelect.value;
+    list.querySelectorAll(".beat-row").forEach(row => { row.hidden = Boolean((term && !row.dataset.search.includes(term)) || (mood && !row.dataset.moods.split("|").includes(mood))); });
+  };
+  document.querySelector("#beat-search").addEventListener("input", applyFilters);
+  moodSelect.addEventListener("change", applyFilters);
+}
+
+function setupForms() {
+  const inquiry = document.querySelector("#inquiry-form");
+  if (inquiry) inquiry.addEventListener("submit", event => {
+    event.preventDefault();
+    const status = document.querySelector("#inquiry-status");
+    if (!SITE_DATA.contactEmail) { status.textContent = "Contact form will be available soon."; return; }
+    const data = new FormData(inquiry);
+    const subject = encodeURIComponent(`808 Brando inquiry — ${data.get("inquiryType")}`);
+    const body = encodeURIComponent(`Reply to: ${data.get("replyTo")}\n\n${data.get("message")}`);
+    window.location.href = `mailto:${SITE_DATA.contactEmail}?subject=${subject}&body=${body}`;
+  });
+  const signup = document.querySelector("#signup-form");
+  if (signup) signup.addEventListener("submit", event => {
+    event.preventDefault();
+    document.querySelector("#signup-status").textContent = SITE_DATA.signupUrl ? "Signup link ready for connection." : "Fan signup will be available soon.";
+  });
+}
+
+function setupNavigation() {
+  const toggle = document.querySelector(".menu-toggle");
+  const nav = document.querySelector(".site-nav");
+  if (!toggle || !nav) return;
+  const close = () => { toggle.setAttribute("aria-expanded", "false"); nav.classList.remove("open"); };
+  toggle.addEventListener("click", () => { const open = toggle.getAttribute("aria-expanded") !== "true"; toggle.setAttribute("aria-expanded", String(open)); nav.classList.toggle("open", open); });
+  nav.querySelectorAll("a").forEach(link => link.addEventListener("click", close));
+  document.addEventListener("keydown", event => { if (event.key === "Escape") { stopAudio(); close(); } });
+}
+
+function setupReveal() {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { document.querySelectorAll(".reveal").forEach(element => element.classList.add("visible")); return; }
+  const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } }), { threshold: 0.08 });
+  document.querySelectorAll(".reveal").forEach(element => observer.observe(element));
+}
+
+if (page === "home") {
+  renderTracklist(); renderVault(); renderUpcoming(); renderReleases(); renderBeatPreview(); setupForms();
+  document.querySelector("#brando-release-date").textContent = SITE_DATA.primaryProject.releaseDate || "Release date pending";
+}
+if (page === "beats") renderBeatStore();
+document.querySelectorAll("#year").forEach(element => { element.textContent = new Date().getFullYear(); });
+setupNavigation();
+setupReveal();
