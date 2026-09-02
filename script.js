@@ -323,7 +323,10 @@ function setupProjectMotion() {
     const rect = project.getBoundingClientRect();
     const range = Math.max(window.innerHeight, rect.height * 0.55);
     const progress = Math.min(1, Math.max(0, -rect.top / range));
-    project.style.setProperty("--project-progress", progress.toFixed(3));
+    project.style.setProperty("--artist-shift", `${(-1.15 * progress).toFixed(3)}rem`);
+    project.style.setProperty("--artist-scale", (1 - 0.035 * progress).toFixed(4));
+    project.style.setProperty("--artist-opacity", (1 - 0.42 * progress).toFixed(4));
+    project.style.setProperty("--cover-scale", (1 + 0.018 * progress).toFixed(4));
     scheduled = false;
   };
   const requestUpdate = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(update); } };
