@@ -66,14 +66,14 @@ const SITE_DATA = {
   beats: [
     // Private source files remain in eightoeightvault. previewUrl stays empty until a
     // specific 30-second public excerpt has been approved and created for that beat.
-    { title: "4AM Check", sourceLabel: "4acheck.m4a", previewUrl: "", bpm: "", key: "", moods: [], formats: { mp3: false, wav: false }, licenses: [], exclusiveContact: true },
-    { title: "F.T.N.", sourceLabel: "F.T.N 152.mp3", previewUrl: "", bpm: "152", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Cold Open", sourceLabel: "INTRO V1 162.mp3", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "What’s the Deal", sourceLabel: "Whats the deal 163.mp3", previewUrl: "", bpm: "163", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Deadman", sourceLabel: "deadman161.wav", previewUrl: "", bpm: "161", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
-    { title: "Downtime", sourceLabel: "downtime151.579.wav", previewUrl: "", bpm: "151.579", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
-    { title: "How It Be", sourceLabel: "how it b 153.mp3", previewUrl: "", bpm: "153", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Make It Wild", sourceLabel: "make it wild 162.mp3", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true }
+    { title: "4AM Check", previewUrl: "", bpm: "", key: "", moods: [], formats: { mp3: false, wav: false }, licenses: [], exclusiveContact: true },
+    { title: "F.T.N.", previewUrl: "", bpm: "152", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Cold Open", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "What’s the Deal", previewUrl: "", bpm: "163", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Deadman", previewUrl: "", bpm: "161", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "Downtime", previewUrl: "", bpm: "151.579", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "How It Be", previewUrl: "", bpm: "153", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Make It Wild", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true }
   ]
 };
 
