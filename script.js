@@ -1,7 +1,8 @@
 /*
   808 BRANDO — EDITABLE SITE DATA
   Fill only confirmed information. Empty values render as neutral pending states.
-  Audio previews should be short files (15–30 seconds recommended).
+  PUBLIC AUDIO RULE: previewUrl values must reference approved short public clips only.
+  Never place full songs, full beats, or private-source URLs in this public file.
 */
 const SITE_DATA = {
   contactEmail: "", // Add the confirmed professional @808brando.com address.
@@ -13,18 +14,26 @@ const SITE_DATA = {
     tracks: [
       { number: 1, title: "Till I Die", feature: "", previewUrl: "" },
       { number: 2, title: "My Daddy Said", feature: "", previewUrl: "" },
-      { number: 3, title: "S.S.", feature: "", previewUrl: "" },
+      { number: 3, title: "S.S.", feature: "", previewUrl: "", links: {
+        spotify: "https://open.spotify.com/album/2t7cqE5mZXSqU1u0Qgn9qJ",
+        appleMusic: "https://music.apple.com/us/album/ss-single/6772166511"
+      } },
       { number: 4, title: "Skinny", feature: "", previewUrl: "" },
       { number: 5, title: "Therapy", feature: "", previewUrl: "" },
       { number: 6, title: "Superbadder", feature: "", previewUrl: "" },
       { number: 7, title: "For The Streets (w/ Luh Hari)", feature: "", previewUrl: "" },
       { number: 8, title: "Dangerous", feature: "", previewUrl: "" },
-      { number: 9, title: "Onna Flo", feature: "", previewUrl: "" },
-      { number: 10, title: "Free The Gang", feature: "", previewUrl: "" }
+      { number: 9, title: "Onna Flo", feature: "", previewUrl: "", links: {
+        spotify: "https://open.spotify.com/album/5kWoqL24PrfVmpdxXvw3Uu",
+        appleMusic: "https://music.apple.com/us/album/onna-flo-single/6799945470",
+        amazon: "http://www.amazon.com/gp/product/B0HDQ785SW"
+      } },
+      { number: 10, title: "Free The Gang", feature: "", previewUrl: "", previewPlanned: true }
     ]
   },
   vault: [
-    // { title: "", status: "", image: "", previewUrl: "assets/audio/vault-preview.mp3" }
+    // previewUrl may reference only an approved clip in assets/audio/vault/ (30 seconds maximum).
+    // { title: "", status: "", image: "", previewUrl: "assets/audio/vault/approved-preview.mp3" }
   ],
   upcoming: [
     { title: "VII" },
@@ -44,7 +53,8 @@ const SITE_DATA = {
   ],
   beats: [
     // {
-    //   title: "", previewUrl: "", bpm: "", key: "", moods: [], price: "",
+    //   previewUrl may reference only an approved clip in assets/audio/beats/ (30 seconds maximum).
+    //   title: "", previewUrl: "assets/audio/beats/approved-preview.mp3", bpm: "", key: "", moods: [], price: "",
     //   licenses: [{ name: "", price: "", buyUrl: "" }], exclusiveContact: true
     // }
   ]
@@ -107,10 +117,26 @@ function renderTracklist() {
     const item = document.createElement("li");
     item.className = "track-row";
     const details = document.createElement("div");
-    details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
+    details.className = "track-info";
+    const streamLinks = Object.entries(track.links || {}).filter(([, url]) => url);
+    if (streamLinks.length) {
+      const titleButton = document.createElement("button");
+      titleButton.className = "track-title-button";
+      titleButton.type = "button";
+      titleButton.setAttribute("aria-expanded", "false");
+      titleButton.innerHTML = `<strong>${track.title}</strong><span>Listen +</span>`;
+      const linkPanel = document.createElement("div");
+      linkPanel.className = "track-streams";
+      linkPanel.hidden = true;
+      streamLinks.forEach(([service, url]) => linkPanel.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener">${platformLabel(service)} ↗</a>`));
+      titleButton.addEventListener("click", () => { const open = linkPanel.hidden; linkPanel.hidden = !open; titleButton.setAttribute("aria-expanded", String(open)); titleButton.querySelector("span").textContent = open ? "Close −" : "Listen +"; });
+      details.append(titleButton, linkPanel);
+    } else {
+      details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
+    }
     item.innerHTML = `<span>${String(track.number || index + 1).padStart(2, "0")}</span>`;
     const preview = track.previewUrl ? audioButton(track.previewUrl) : document.createElement("span");
-    if (!track.previewUrl) { preview.className = "preview-empty"; preview.textContent = "—"; preview.setAttribute("aria-label", "No preview available"); }
+    if (!track.previewUrl) { preview.className = track.previewPlanned || streamLinks.length ? "preview-status" : "preview-empty"; preview.textContent = track.previewPlanned ? "Preview pending" : streamLinks.length ? "Released" : "—"; }
     item.append(details, preview);
     list.appendChild(item);
   });
@@ -140,7 +166,7 @@ function renderUpcoming() {
 }
 
 function platformLabel(key) {
-  return { appleMusic: "Apple Music", spotify: "Spotify", youtube: "YouTube", other: "More" }[key] || key;
+  return { appleMusic: "Apple Music", spotify: "Spotify", amazon: "Amazon", youtube: "YouTube", other: "More" }[key] || key;
 }
 
 function renderReleases() {
