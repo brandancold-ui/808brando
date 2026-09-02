@@ -9,9 +9,18 @@ const SITE_DATA = {
   primaryProject: {
     title: "BRANDO",
     cover: "4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png",
-    releaseDate: "",
+    releaseDate: "November 1",
     tracks: [
-      // { number: 1, title: "", feature: "", previewUrl: "assets/audio/preview.mp3" }
+      { number: 1, title: "Till I Die", feature: "", previewUrl: "" },
+      { number: 2, title: "My Daddy Said", feature: "", previewUrl: "" },
+      { number: 3, title: "S.S.", feature: "", previewUrl: "" },
+      { number: 4, title: "Skinny", feature: "", previewUrl: "" },
+      { number: 5, title: "Therapy", feature: "", previewUrl: "" },
+      { number: 6, title: "Superbadder", feature: "", previewUrl: "" },
+      { number: 7, title: "For The Streets (w/ Luh Hari)", feature: "", previewUrl: "" },
+      { number: 8, title: "Dangerous", feature: "", previewUrl: "" },
+      { number: 9, title: "Onna Flo", feature: "", previewUrl: "" },
+      { number: 10, title: "Free The Gang", feature: "", previewUrl: "" }
     ]
   },
   vault: [
@@ -100,7 +109,9 @@ function renderTracklist() {
     const details = document.createElement("div");
     details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
     item.innerHTML = `<span>${String(track.number || index + 1).padStart(2, "0")}</span>`;
-    item.append(details, audioButton(track.previewUrl || ""));
+    const preview = track.previewUrl ? audioButton(track.previewUrl) : document.createElement("span");
+    if (!track.previewUrl) { preview.className = "preview-empty"; preview.textContent = "—"; preview.setAttribute("aria-label", "No preview available"); }
+    item.append(details, preview);
     list.appendChild(item);
   });
 }
