@@ -64,16 +64,16 @@ const SITE_DATA = {
     } }
   ],
   beats: [
-    // {
-    //   previewUrl may reference only an approved clip in assets/audio/beats/ (30 seconds maximum).
-    //   title: "", previewUrl: "assets/audio/beats/approved-preview.mp3", bpm: "", key: "", moods: [],
-    //   formats: { mp3: false, wav: false },
-    //   licenses: [
-    //     { name: "MP3 LEASE", price: "$45", buyUrl: "" },
-    //     { name: "WAV LEASE", price: "$80", buyUrl: "" },
-    //     { name: "EXCLUSIVE", price: "$400", buyUrl: "mailto:contact@808brando.com" }
-    //   ], exclusiveContact: true
-    // }
+    // Private source files remain in eightoeightvault. previewUrl stays empty until a
+    // specific 30-second public excerpt has been approved and created for that beat.
+    { title: "4AM Check", sourceLabel: "4acheck.m4a", previewUrl: "", bpm: "", key: "", moods: [], formats: { mp3: false, wav: false }, licenses: [], exclusiveContact: true },
+    { title: "F.T.N.", sourceLabel: "F.T.N 152.mp3", previewUrl: "", bpm: "152", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Cold Open", sourceLabel: "INTRO V1 162.mp3", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "What’s the Deal", sourceLabel: "Whats the deal 163.mp3", previewUrl: "", bpm: "163", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Deadman", sourceLabel: "deadman161.wav", previewUrl: "", bpm: "161", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "Downtime", sourceLabel: "downtime151.579.wav", previewUrl: "", bpm: "151.579", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "How It Be", sourceLabel: "how it b 153.mp3", previewUrl: "", bpm: "153", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Make It Wild", sourceLabel: "make it wild 162.mp3", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true }
   ]
 };
 
@@ -237,7 +237,8 @@ function beatRow(beat) {
   item.dataset.moods = (beat.moods || []).join("|");
   const info = document.createElement("div");
   info.className = "beat-title";
-  info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${(beat.moods || []).join(" · ") || "Tags pending"}</p>`;
+  const formatLabels = Object.entries(beat.formats || {}).filter(([, available]) => available).map(([format]) => format.toUpperCase());
+  info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${formatLabels.join(" · ") || "Format pending"}</p>`;
   item.append(info);
   const firstPrice = beat.price || (beat.licenses || []).find(license => license.price)?.price || "—";
   [beat.bpm || "—", beat.key || "—", firstPrice].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
@@ -252,7 +253,7 @@ function beatRow(beat) {
       action.textContent = `${license.name}${license.price ? ` · ${license.price}` : ""}`;
       actions.appendChild(action);
     });
-    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", '<a href="mailto:contact@808brando.com?subject=Exclusive%20beat%20inquiry">Exclusive inquiry</a>');
+    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", `<a href="mailto:contact@808brando.com?subject=${encodeURIComponent(`${beat.title || "Beat"} — Exclusive inquiry`)}">Exclusive · $400</a>`);
     item.appendChild(actions);
   }
   return item;
