@@ -64,16 +64,15 @@ const SITE_DATA = {
     } }
   ],
   beats: [
-    // Private source files remain in eightoeightvault. previewUrl stays empty until a
-    // specific 30-second public excerpt has been approved and created for that beat.
-    { title: "4AM Check", previewUrl: "", bpm: "", key: "", moods: [], formats: { mp3: false, wav: false }, licenses: [], exclusiveContact: true },
-    { title: "F.T.N.", previewUrl: "", bpm: "152", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Cold Open", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "What’s the Deal", previewUrl: "", bpm: "163", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Deadman", previewUrl: "", bpm: "161", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
-    { title: "Downtime", previewUrl: "", bpm: "151.579", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
-    { title: "How It Be", previewUrl: "", bpm: "153", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
-    { title: "Make It Wild", previewUrl: "", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true }
+    // Every previewUrl below references an approved public excerpt under 30 seconds.
+    { title: "4AM Check", previewUrl: "assets/audio/beats/4am-check-preview.mp3", bpm: "", key: "", moods: [], formats: { mp3: false, wav: false }, licenses: [], exclusiveContact: true },
+    { title: "F.T.N.", previewUrl: "assets/audio/beats/ftn-preview.mp3", bpm: "152", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Cold Open", previewUrl: "assets/audio/beats/cold-open-preview.mp3", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "What’s the Deal", previewUrl: "assets/audio/beats/whats-the-deal-preview.mp3", bpm: "163", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Deadman", previewUrl: "assets/audio/beats/deadman-preview.mp3", bpm: "161", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "Downtime", previewUrl: "assets/audio/beats/downtime-preview.mp3", bpm: "151.579", key: "", moods: [], formats: { mp3: false, wav: true }, licenses: [{ name: "WAV LEASE", price: "$80", buyUrl: "" }], exclusiveContact: true },
+    { title: "How It Be", previewUrl: "assets/audio/beats/how-it-be-preview.mp3", bpm: "153", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true },
+    { title: "Make It Wild", previewUrl: "assets/audio/beats/make-it-wild-preview.mp3", bpm: "162", key: "", moods: [], formats: { mp3: true, wav: false }, licenses: [{ name: "MP3 LEASE", price: "$45", buyUrl: "" }], exclusiveContact: true }
   ]
 };
 
@@ -103,7 +102,8 @@ function playPreview(url, button, progress, time) {
   if (!url) return;
   if (activeButton === button && activeAudio && !activeAudio.paused) { stopAudio(); return; }
   stopAudio();
-  activeAudio = new Audio(url);
+  const scriptUrl = document.querySelector('script[src*="script.js"]')?.src || document.baseURI;
+  activeAudio = new Audio(new URL(url, scriptUrl).href);
   activeAudio.preload = "metadata";
   activeButton = button;
   activeProgress = progress;
