@@ -28,7 +28,7 @@ const SITE_DATA = {
         appleMusic: "https://music.apple.com/us/album/onna-flo-single/6799945470",
         amazon: "http://www.amazon.com/gp/product/B0HDQ785SW"
       } },
-      { number: 10, title: "Free The Gang", feature: "", previewUrl: "", previewPlanned: true }
+      { number: 10, title: "Free The Gang", feature: "", previewUrl: "assets/audio/project-previews/free-the-gang-preview.mp3" }
     ]
   },
   vault: [
