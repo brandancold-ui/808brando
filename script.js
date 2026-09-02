@@ -5,12 +5,12 @@
   Never place full songs, full beats, or private-source URLs in this public file.
 */
 const SITE_DATA = {
-  contactEmail: "", // Add the confirmed professional @808brando.com address.
+  contactEmail: "contact@808brando.com",
   signupUrl: "", // Add a future mailing-list form URL or endpoint.
   primaryProject: {
     title: "BRANDO",
     cover: "4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png",
-    releaseDate: "November 1",
+    releaseDate: "NOVEMBER 1",
     tracks: [
       { number: 1, title: "Till I Die", feature: "", previewUrl: "" },
       { number: 2, title: "My Daddy Said", feature: "", previewUrl: "" },
@@ -49,13 +49,30 @@ const SITE_DATA = {
     "D1B7AF8A-D91B-43CA-BC2B-C20FFFDC2A6B.jpeg"
   ],
   releases: [
-    // { title: "", cover: "", links: { appleMusic: "", spotify: "", youtube: "", other: "" } }
+    { title: "S.S.", cover: "assets/artwork/releases/ss.jpg", links: {
+      spotify: "https://open.spotify.com/album/2t7cqE5mZXSqU1u0Qgn9qJ",
+      appleMusic: "https://music.apple.com/us/album/ss-single/6772166511"
+    } },
+    { title: "Onna Flo", cover: "assets/artwork/releases/onna-flo.jpg", links: {
+      spotify: "https://open.spotify.com/album/5kWoqL24PrfVmpdxXvw3Uu",
+      appleMusic: "https://music.apple.com/us/album/onna-flo-single/6799945470",
+      amazon: "http://www.amazon.com/gp/product/B0HDQ785SW"
+    } },
+    { title: "I Ain’t Say That", cover: "assets/artwork/releases/i-aint-say-that.jpg", links: {
+      spotify: "https://open.spotify.com/track/677gZd1G8dXgJZSkLyHsHB",
+      appleMusic: "https://music.apple.com/us/album/i-aint-say-that/1697637272?i=1697637273"
+    } }
   ],
   beats: [
     // {
     //   previewUrl may reference only an approved clip in assets/audio/beats/ (30 seconds maximum).
-    //   title: "", previewUrl: "assets/audio/beats/approved-preview.mp3", bpm: "", key: "", moods: [], price: "",
-    //   licenses: [{ name: "", price: "", buyUrl: "" }], exclusiveContact: true
+    //   title: "", previewUrl: "assets/audio/beats/approved-preview.mp3", bpm: "", key: "", moods: [],
+    //   formats: { mp3: false, wav: false },
+    //   licenses: [
+    //     { name: "MP3 LEASE", price: "$45", buyUrl: "" },
+    //     { name: "WAV LEASE", price: "$80", buyUrl: "" },
+    //     { name: "EXCLUSIVE", price: "$400", buyUrl: "mailto:contact@808brando.com" }
+    //   ], exclusiveContact: true
     // }
   ]
 };
@@ -63,35 +80,71 @@ const SITE_DATA = {
 const page = document.body.dataset.page;
 let activeAudio = null;
 let activeButton = null;
+let activeProgress = null;
+let activeTime = null;
+
+function formatTime(value, round = false) {
+  const seconds = Math.max(0, (round ? Math.round : Math.floor)(Number(value) || 0));
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
 
 function stopAudio() {
   if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; }
   if (activeButton) activeButton.textContent = activeButton.dataset.idle || "Play";
+  if (activeProgress) activeProgress.value = 0;
+  if (activeTime) activeTime.textContent = "0:00 / 0:30";
   activeAudio = null;
   activeButton = null;
+  activeProgress = null;
+  activeTime = null;
 }
 
-function playPreview(url, button) {
+function playPreview(url, button, progress, time) {
   if (!url) return;
   if (activeButton === button && activeAudio && !activeAudio.paused) { stopAudio(); return; }
   stopAudio();
   activeAudio = new Audio(url);
+  activeAudio.preload = "metadata";
   activeButton = button;
+  activeProgress = progress;
+  activeTime = time;
   button.dataset.idle = button.textContent;
   button.textContent = "Pause";
-  activeAudio.addEventListener("timeupdate", () => { if (activeAudio && activeAudio.currentTime >= 30) stopAudio(); });
+  activeAudio.addEventListener("loadedmetadata", () => {
+    if (!activeAudio) return;
+    const duration = Math.min(activeAudio.duration || 30, 30);
+    progress.max = duration;
+    time.textContent = `0:00 / ${formatTime(duration, true)}`;
+  }, { once: true });
+  activeAudio.addEventListener("timeupdate", () => {
+    if (!activeAudio) return;
+    const duration = Math.min(activeAudio.duration || 30, 30);
+    progress.value = Math.min(activeAudio.currentTime, duration);
+    time.textContent = `${formatTime(activeAudio.currentTime)} / ${formatTime(duration, true)}`;
+    if (activeAudio.currentTime >= 30) stopAudio();
+  });
   activeAudio.addEventListener("ended", stopAudio, { once: true });
   activeAudio.play().catch(() => { button.textContent = "Unavailable"; activeAudio = null; activeButton = null; });
 }
 
 function audioButton(url, label = "Play") {
+  const control = document.createElement("div");
+  control.className = "audio-control";
   const button = document.createElement("button");
   button.className = "audio-button";
   button.type = "button";
   button.textContent = url ? label : "Pending";
   button.disabled = !url;
-  if (url) button.addEventListener("click", () => playPreview(url, button));
-  return button;
+  if (!url) control.classList.add("pending");
+  const progress = document.createElement("progress");
+  progress.className = "audio-progress";
+  progress.max = 30;
+  progress.value = 0;
+  const time = document.createElement("time");
+  time.textContent = "0:00 / 0:30";
+  if (url) button.addEventListener("click", () => playPreview(url, button, progress, time));
+  control.append(button, progress, time);
+  return control;
 }
 
 function emptyState(text, className = "empty-state") {
@@ -118,25 +171,17 @@ function renderTracklist() {
     item.className = "track-row";
     const details = document.createElement("div");
     details.className = "track-info";
-    const streamLinks = Object.entries(track.links || {}).filter(([, url]) => url);
+    const streamLinks = Object.entries(track.links || {}).filter(([service, url]) => url && ["spotify", "appleMusic"].includes(service));
+    details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
     if (streamLinks.length) {
-      const titleButton = document.createElement("button");
-      titleButton.className = "track-title-button";
-      titleButton.type = "button";
-      titleButton.setAttribute("aria-expanded", "false");
-      titleButton.innerHTML = `<strong>${track.title}</strong><span>Listen +</span>`;
-      const linkPanel = document.createElement("div");
-      linkPanel.className = "track-streams";
-      linkPanel.hidden = true;
-      streamLinks.forEach(([service, url]) => linkPanel.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener">${platformLabel(service)} ↗</a>`));
-      titleButton.addEventListener("click", () => { const open = linkPanel.hidden; linkPanel.hidden = !open; titleButton.setAttribute("aria-expanded", String(open)); titleButton.querySelector("span").textContent = open ? "Close −" : "Listen +"; });
-      details.append(titleButton, linkPanel);
-    } else {
-      details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
+      const actions = document.createElement("div");
+      actions.className = "track-streams-direct";
+      streamLinks.forEach(([service, url]) => actions.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener" aria-label="Open ${track.title} on ${platformLabel(service)}">${service === "spotify" ? "Spotify" : "Apple"}</a>`));
+      details.appendChild(actions);
     }
     item.innerHTML = `<span>${String(track.number || index + 1).padStart(2, "0")}</span>`;
     const preview = track.previewUrl ? audioButton(track.previewUrl) : document.createElement("span");
-    if (!track.previewUrl) { preview.className = track.previewPlanned || streamLinks.length ? "preview-status" : "preview-empty"; preview.textContent = track.previewPlanned ? "Preview pending" : streamLinks.length ? "Released" : "—"; }
+    if (!track.previewUrl) { preview.className = streamLinks.length ? "preview-status" : "preview-empty"; preview.textContent = streamLinks.length ? "Out now" : "—"; }
     item.append(details, preview);
     list.appendChild(item);
   });
@@ -161,8 +206,8 @@ function renderUpcoming() {
   const grid = document.querySelector("#upcoming-grid");
   const rail = document.querySelector("#concept-rail");
   if (!grid || !rail) return;
-  SITE_DATA.upcoming.forEach((project, index) => grid.insertAdjacentHTML("beforeend", `<article class="upcoming-card reveal"><span>${String(index + 1).padStart(2, "0")}</span><h3>${project.title}</h3><p>Details pending</p></article>`));
-  SITE_DATA.coverConcepts.forEach((cover, index) => rail.insertAdjacentHTML("beforeend", `<figure><img src="${cover}" alt="Unassigned cover concept ${index + 1}" loading="lazy"><figcaption>Concept ${String(index + 1).padStart(2, "0")}</figcaption></figure>`));
+  SITE_DATA.upcoming.forEach((project, index) => grid.insertAdjacentHTML("beforeend", `<article class="upcoming-card reveal"><span>${String(index + 1).padStart(2, "0")}</span><h3>${project.title}</h3></article>`));
+  SITE_DATA.coverConcepts.forEach((cover, index) => rail.insertAdjacentHTML("beforeend", `<figure><img src="${cover}" alt="Upcoming artwork ${index + 1}" loading="lazy"></figure>`));
 }
 
 function platformLabel(key) {
@@ -176,7 +221,7 @@ function renderReleases() {
   SITE_DATA.releases.forEach(release => {
     const item = document.createElement("article");
     item.className = "release-card reveal";
-    item.innerHTML = `<img src="${release.cover}" alt="${release.title || "Release"} cover artwork"><h3>${release.title || "Title pending"}</h3>`;
+    item.innerHTML = `<img src="${release.cover}" alt="Official ${release.title || "release"} cover artwork" loading="lazy" width="632" height="632"><h3>${release.title || "Title pending"}</h3>`;
     const links = document.createElement("div");
     links.className = "stream-links";
     Object.entries(release.links || {}).filter(([, url]) => url).forEach(([service, url]) => links.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener">${platformLabel(service)} ↗</a>`));
@@ -194,13 +239,20 @@ function beatRow(beat) {
   info.className = "beat-title";
   info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${(beat.moods || []).join(" · ") || "Tags pending"}</p>`;
   item.append(info);
-  [beat.bpm || "—", beat.key || "—", beat.price || "—"].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
+  const firstPrice = beat.price || (beat.licenses || []).find(license => license.price)?.price || "—";
+  [beat.bpm || "—", beat.key || "—", firstPrice].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
   item.appendChild(audioButton(beat.previewUrl || ""));
   if ((beat.licenses || []).length || beat.exclusiveContact) {
     const actions = document.createElement("div");
     actions.className = "beat-actions";
-    (beat.licenses || []).forEach(license => { const link = document.createElement("a"); link.href = license.buyUrl || "#"; link.textContent = `${license.name}${license.price ? ` · ${license.price}` : ""}`; if (!license.buyUrl) link.setAttribute("aria-disabled", "true"); actions.appendChild(link); });
-    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", '<a href="index.html#contact">Exclusive inquiry</a>');
+    (beat.licenses || []).forEach(license => {
+      const action = document.createElement(license.buyUrl ? "a" : "span");
+      if (license.buyUrl) action.href = license.buyUrl;
+      else action.setAttribute("aria-disabled", "true");
+      action.textContent = `${license.name}${license.price ? ` · ${license.price}` : ""}`;
+      actions.appendChild(action);
+    });
+    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", '<a href="mailto:contact@808brando.com?subject=Exclusive%20beat%20inquiry">Exclusive inquiry</a>');
     item.appendChild(actions);
   }
   return item;
@@ -216,10 +268,14 @@ function renderBeatPreview() {
 function renderBeatStore() {
   const list = document.querySelector("#beat-list");
   if (!list) return;
-  if (!SITE_DATA.beats.length) list.appendChild(emptyState("Beat inventory pending."));
+  if (!SITE_DATA.beats.length) list.appendChild(emptyState("Catalog pending."));
   else SITE_DATA.beats.forEach(beat => list.appendChild(beatRow(beat)));
   const moods = [...new Set(SITE_DATA.beats.flatMap(beat => beat.moods || []))].sort();
   const moodSelect = document.querySelector("#beat-mood");
+  if (!SITE_DATA.beats.length) {
+    document.querySelector("#beat-search").disabled = true;
+    moodSelect.disabled = true;
+  }
   moods.forEach(mood => moodSelect.insertAdjacentHTML("beforeend", `<option value="${mood}">${mood}</option>`));
   const applyFilters = () => {
     const term = document.querySelector("#beat-search").value.trim().toLowerCase();
@@ -258,6 +314,23 @@ function setupNavigation() {
   document.addEventListener("keydown", event => { if (event.key === "Escape") { stopAudio(); close(); } });
 }
 
+function setupProjectMotion() {
+  const project = document.querySelector(".primary-project");
+  if (!project || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  let scheduled = false;
+  const update = () => {
+    const rect = project.getBoundingClientRect();
+    const range = Math.max(window.innerHeight, rect.height * 0.55);
+    const progress = Math.min(1, Math.max(0, -rect.top / range));
+    project.style.setProperty("--project-progress", progress.toFixed(3));
+    scheduled = false;
+  };
+  const requestUpdate = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(update); } };
+  update();
+  addEventListener("scroll", requestUpdate, { passive: true });
+  addEventListener("resize", requestUpdate, { passive: true });
+}
+
 function setupReveal() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { document.querySelectorAll(".reveal").forEach(element => element.classList.add("visible")); return; }
   const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } }), { threshold: 0.08 });
@@ -265,10 +338,11 @@ function setupReveal() {
 }
 
 if (page === "home") {
-  renderTracklist(); renderVault(); renderUpcoming(); renderReleases(); renderBeatPreview(); setupForms();
+  renderTracklist(); renderUpcoming(); renderReleases(); setupForms();
   document.querySelector("#brando-release-date").textContent = SITE_DATA.primaryProject.releaseDate || "Release date pending";
 }
 if (page === "beats") renderBeatStore();
 document.querySelectorAll("#year").forEach(element => { element.textContent = new Date().getFullYear(); });
 setupNavigation();
 setupReveal();
+setupProjectMotion();

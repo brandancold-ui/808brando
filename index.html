@@ -4,81 +4,79 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#050505" />
-    <meta name="description" content="Official website of rap artist and producer 808 Brando. Music, unreleased Vault previews, beats, and business inquiries." />
+    <meta name="description" content="Official 808 Brando website. Music, releases, beats, and contact." />
+    <link rel="canonical" href="https://808brando.com/" />
     <meta property="og:title" content="808 Brando — Official Website" />
-    <meta property="og:description" content="Music, cover art, Vault previews, beats, and official updates from 808 Brando." />
+    <meta property="og:description" content="Music, releases, beats, and contact." />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://808brando.com/" />
     <meta property="og:image" content="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <title>808 Brando — Official Website</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="styles.css" />
     <script src="script.js" defer></script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to music</a>
     <header class="site-header" id="top">
-      <a class="mini-mark" href="#music" aria-label="808 Brando home">808B</a>
+      <a class="mini-mark" href="#top" aria-label="808 Brando home">808 Brando</a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Open menu</span><span></span><span></span></button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#music">Music</a><a href="#vault">Vault</a><a href="#beats">Beats</a><a href="#contact">Contact</a>
+        <a href="#music">Music</a><a href="beats/">Beats</a><a href="#contact">Contact</a>
       </nav>
     </header>
 
     <main id="main">
       <section class="primary-project" id="music" aria-labelledby="brando-title">
         <p class="artist-name reveal">808 Brando</p>
-        <figure class="primary-cover reveal"><img src="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" alt="BRANDO cover artwork featuring 808 Brando and his mother" /></figure>
-        <div class="primary-release reveal">
-          <h1 id="brando-title">Brando</h1>
-          <p id="brando-release-date" class="release-date">Release date pending</p>
-        </div>
-        <div class="tracklist-shell reveal" aria-labelledby="tracklist-title">
-          <div class="section-kicker"><h2 id="tracklist-title">BRANDO tracklist</h2><span>Preview</span></div>
-          <ol class="tracklist" id="brando-tracklist"></ol>
-        </div>
-      </section>
-
-      <section class="vault section-dark" id="vault" aria-labelledby="vault-title">
-        <header class="split-heading reveal"><div><p class="section-index">Unreleased</p><h2 id="vault-title">The Vault</h2></div><p>Snippets and unreleased music.</p></header>
-        <div class="vault-list" id="vault-list"></div>
-        <p class="future-note">Vault access and fan exclusives can be added here later.</p>
-      </section>
-
-      <section class="upcoming" id="upcoming" aria-labelledby="upcoming-title">
-        <header class="split-heading reveal"><div><p class="section-index">In development</p><h2 id="upcoming-title">Upcoming</h2></div></header>
-        <div class="upcoming-grid" id="upcoming-grid"></div>
-        <div class="concept-block reveal">
-          <div class="section-kicker"><h3>Cover concepts</h3><span>Artwork not assigned</span></div>
-          <div class="concept-rail" id="concept-rail" aria-label="Unassigned cover concepts"></div>
+        <div class="project-grid">
+          <div class="project-visual">
+            <figure class="primary-cover reveal"><img src="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" alt="Official BRANDO artwork featuring 808 Brando and his mother" /></figure>
+            <div class="primary-release reveal">
+              <h1 id="brando-title">“BRANDO”</h1>
+              <p id="brando-release-date" class="release-date">NOVEMBER 1</p>
+            </div>
+          </div>
+          <div class="tracklist-shell reveal" aria-labelledby="tracklist-title">
+            <div class="section-kicker"><h2 id="tracklist-title">Tracklist</h2><span>10 tracks</span></div>
+            <ol class="tracklist" id="brando-tracklist"></ol>
+          </div>
         </div>
       </section>
 
       <section class="out-now section-dark" id="out-now" aria-labelledby="out-now-title">
-        <header class="split-heading reveal"><div><p class="section-index">Released music</p><h2 id="out-now-title">Out Now</h2></div><p>Official listening links will appear with each release.</p></header>
+        <header class="split-heading reveal"><div><h2 id="out-now-title">Out Now</h2></div></header>
         <div class="release-grid" id="release-grid"></div>
       </section>
 
+      <section class="upcoming" id="upcoming" aria-labelledby="upcoming-title">
+        <header class="split-heading reveal"><div><h2 id="upcoming-title">Upcoming</h2></div></header>
+        <div class="upcoming-grid" id="upcoming-grid"></div>
+        <div class="concept-block reveal">
+          <div class="section-kicker"><h3>Artwork</h3></div>
+          <div class="concept-rail" id="concept-rail" aria-label="Upcoming artwork"></div>
+        </div>
+      </section>
+
       <section class="beats-teaser" id="beats" aria-labelledby="beats-title">
-        <div class="beats-copy reveal"><p class="section-index">808 Brando production</p><h2 id="beats-title">Beats</h2><p>Beat previews, leases, licenses, and exclusive inquiries.</p><a class="action action-light" href="beats.html">Enter Beat Store <span aria-hidden="true">→</span></a></div>
-        <div class="beats-preview reveal" id="beats-preview"></div>
+        <div class="beats-copy reveal"><h2 id="beats-title">Beats</h2><a class="action action-light" href="beats/">View Beat Store <span aria-hidden="true">→</span></a></div>
       </section>
 
       <section class="contact" id="contact" aria-labelledby="contact-title">
-        <header class="split-heading reveal"><div><p class="section-index">Business</p><h2 id="contact-title">Contact</h2></div><p>Business, production, features, and booking.</p></header>
-        <form class="inquiry-form reveal" id="inquiry-form">
-          <label><span>Inquiry type</span><select id="inquiry-type" name="inquiryType" required><option value="">Choose one</option><option>Business</option><option>Beats / Production</option><option>Features</option><option>Booking</option></select></label>
-          <label><span>Your email</span><input type="email" name="replyTo" autocomplete="email" placeholder="you@example.com" required /></label>
-          <label class="full-field"><span>Message</span><textarea name="message" rows="5" placeholder="Write your inquiry" required></textarea></label>
-          <div class="form-submit full-field"><button class="action action-light" type="submit">Prepare inquiry <span aria-hidden="true">→</span></button><p class="form-status" id="inquiry-status" role="status"></p></div>
-        </form>
+        <header class="split-heading reveal"><div><h2 id="contact-title">Contact</h2></div></header>
+        <div class="contact-direct reveal">
+          <div class="contact-types" aria-label="Contact purposes"><span>Features</span><span>Beats</span><span>Booking</span><span>Business</span></div>
+          <a class="contact-email" href="mailto:contact@808brando.com">contact@808brando.com</a>
+        </div>
       </section>
 
       <section class="fan-signup" aria-labelledby="signup-title">
-        <div><p class="section-index">Updates</p><h2 id="signup-title">Stay close.</h2><p>New music, Vault drops, releases, and future merch.</p></div>
-        <form id="signup-form"><label class="sr-only" for="signup-email">Email address</label><input id="signup-email" type="email" name="email" autocomplete="email" placeholder="Email address" required /><button type="submit">Join <span aria-hidden="true">→</span></button><p class="form-status" id="signup-status" role="status"></p></form>
+        <h2 id="signup-title">Stay Locked In</h2>
+        <form id="signup-form"><label class="sr-only" for="signup-email">Email address</label><input id="signup-email" type="email" name="email" autocomplete="email" placeholder="Email" disabled /><button type="submit" disabled>Join</button></form>
       </section>
     </main>
 
-    <footer class="site-footer"><a href="#top" class="footer-mark">808 Brando</a><p>Official artist website · © <span id="year"></span></p><a href="#top">Top ↑</a></footer>
+    <footer class="site-footer"><a href="#top" class="footer-mark">808 Brando</a><nav aria-label="Artist links"><a href="https://www.instagram.com/808brando_" target="_blank" rel="noopener">Instagram</a><a href="https://open.spotify.com/artist/403LEb2BrQdkKDsTrq62Lx" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/artist/808-brando/1687278750" target="_blank" rel="noopener">Apple Music</a></nav><p>© <span id="year"></span> 808 Brando</p></footer>
   </body>
 </html>
