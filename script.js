@@ -6,6 +6,7 @@
 */
 const SITE_DATA = {
   contactEmail: "contact@808brando.com",
+  licenseTermsUrl: "https://808brando.com/license/",
   signupUrl: "", // Add a future mailing-list form URL or endpoint.
   primaryProject: {
     title: "BRANDO",
@@ -306,7 +307,7 @@ function beatLicenseInquiryUrl(beat, license) {
   const beatName = beat.title || "Beat";
   const price = license.price || "Price pending";
   const subject = `${beatName} — ${licenseName} — ${price}`;
-  const body = `Beat: ${beatName}\nLicense: ${licenseName}\nPrice: ${price}\n\nPlease confirm availability and payment instructions.`;
+  const body = `I want to purchase this beat license.\n\nBeat: ${beatName}\nLicense: ${licenseName}\nPrice: ${price}\nLicense terms: ${SITE_DATA.licenseTermsUrl}\n\nPlease confirm availability and payment instructions.`;
   return `mailto:${SITE_DATA.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 

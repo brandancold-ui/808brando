@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://808brando.com/license/checkout-schema.json",
+  "title": "808 Brando Beat License Purchase Record",
+  "description": "Data structure for a future verified checkout. This file does not process payments.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "buyerLegalName",
+    "buyerArtistOrBusinessName",
+    "buyerEmail",
+    "beatTitle",
+    "licenseType",
+    "amount",
+    "purchaseDate",
+    "transactionId",
+    "agreementVersion",
+    "termsAccepted"
+  ],
+  "properties": {
+    "buyerLegalName": { "type": "string", "minLength": 1 },
+    "buyerArtistOrBusinessName": { "type": "string", "minLength": 1 },
+    "buyerEmail": { "type": "string", "format": "email" },
+    "beatTitle": { "type": "string", "minLength": 1 },
+    "licenseType": { "enum": ["MP3 Lease", "WAV Lease", "Exclusive"] },
+    "amount": { "type": "number", "minimum": 0 },
+    "currency": { "const": "USD", "default": "USD" },
+    "purchaseDate": { "type": "string", "format": "date-time" },
+    "transactionId": { "type": "string", "minLength": 1 },
+    "agreementVersion": { "const": "1.0" },
+    "termsAccepted": {
+      "type": "boolean",
+      "const": true,
+      "description": "Must be affirmatively selected by the buyer and must never be prechecked.",
+      "x-ui": { "control": "checkbox", "initialValue": false }
+    }
+  }
+}
