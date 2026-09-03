@@ -204,7 +204,8 @@ function renderTracklist() {
   }
   tracks.forEach((track, index) => {
     const item = document.createElement("li");
-    item.className = "track-row";
+    item.className = "track-row reveal";
+    item.style.setProperty("--reveal-delay", `${index * 35}ms`);
     const details = document.createElement("div");
     details.className = "track-info";
     const streamLinks = Object.entries(track.links || {}).filter(([service, url]) => url && ["spotify", "appleMusic"].includes(service));
@@ -254,9 +255,10 @@ function renderReleases() {
   const grid = document.querySelector("#release-grid");
   if (!grid) return;
   if (!SITE_DATA.releases.length) { grid.appendChild(emptyState("Official releases and listening links pending.")); return; }
-  SITE_DATA.releases.forEach(release => {
+  SITE_DATA.releases.forEach((release, index) => {
     const item = document.createElement("article");
     item.className = "release-card reveal";
+    item.style.setProperty("--reveal-delay", `${index * 70}ms`);
     item.innerHTML = `<img src="${release.cover}" alt="Official ${release.title || "release"} cover artwork" loading="lazy" width="632" height="632"><h3>${release.title || "Title pending"}</h3>`;
     const links = document.createElement("div");
     links.className = "stream-links";
@@ -266,9 +268,10 @@ function renderReleases() {
   });
 }
 
-function beatRow(beat) {
+function beatRow(beat, index = 0) {
   const item = document.createElement("article");
   item.className = "beat-row reveal";
+  item.style.setProperty("--reveal-delay", `${Math.min(index, 7) * 35}ms`);
   item.dataset.search = `${beat.title || ""} ${(beat.moods || []).join(" ")}`.toLowerCase();
   item.dataset.moods = (beat.moods || []).join("|");
   const info = document.createElement("div");
@@ -311,14 +314,14 @@ function renderBeatPreview() {
   const target = document.querySelector("#beats-preview");
   if (!target) return;
   if (!SITE_DATA.beats.length) { target.appendChild(emptyState("Beat inventory pending.", "beats-empty")); return; }
-  SITE_DATA.beats.slice(0, 3).forEach(beat => target.appendChild(beatRow(beat)));
+  SITE_DATA.beats.slice(0, 3).forEach((beat, index) => target.appendChild(beatRow(beat, index)));
 }
 
 function renderBeatStore() {
   const list = document.querySelector("#beat-list");
   if (!list) return;
   if (!SITE_DATA.beats.length) list.appendChild(emptyState("Catalog pending."));
-  else SITE_DATA.beats.forEach(beat => list.appendChild(beatRow(beat)));
+  else SITE_DATA.beats.forEach((beat, index) => list.appendChild(beatRow(beat, index)));
   const moods = [...new Set(SITE_DATA.beats.flatMap(beat => beat.moods || []))].sort();
   const moodSelect = document.querySelector("#beat-mood");
   if (!SITE_DATA.beats.length) {
@@ -387,6 +390,19 @@ function setupProjectMotion() {
   addEventListener("resize", requestUpdate, { passive: true });
 }
 
+function setupHeader() {
+  const header = document.querySelector(".site-header");
+  if (!header) return;
+  let scheduled = false;
+  const update = () => {
+    header.classList.toggle("scrolled", window.scrollY > 24);
+    scheduled = false;
+  };
+  const requestUpdate = () => { if (!scheduled) { scheduled = true; requestAnimationFrame(update); } };
+  update();
+  addEventListener("scroll", requestUpdate, { passive: true });
+}
+
 function setupReveal() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { document.querySelectorAll(".reveal").forEach(element => element.classList.add("visible")); return; }
   const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("visible"); observer.unobserve(entry.target); } }), { threshold: 0.08 });
@@ -400,5 +416,6 @@ if (page === "home") {
 if (page === "beats") renderBeatStore();
 document.querySelectorAll("#year").forEach(element => { element.textContent = new Date().getFullYear(); });
 setupNavigation();
+setupHeader();
 setupReveal();
 setupProjectMotion();
