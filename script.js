@@ -104,6 +104,7 @@ function stopAudio() {
 function playPreview(url, button, progress, time) {
   if (!url) return;
   if (activeButton === button && activeAudio) {
+    const audio = activeAudio;
     if (!activeAudio.paused) {
       activeAudio.pause();
       button.textContent = button.dataset.idle || "Play";
@@ -112,34 +113,51 @@ function playPreview(url, button, progress, time) {
     }
     button.textContent = "Pause";
     button.setAttribute("aria-pressed", "true");
-    activeAudio.play().catch(() => { button.textContent = "Unavailable"; stopAudio(); });
+    activeAudio.play().catch(() => {
+      if (activeAudio !== audio) return;
+      button.textContent = button.dataset.idle || "Play";
+      button.setAttribute("aria-pressed", "false");
+      activeAudio = null;
+      activeButton = null;
+      activeProgress = null;
+      activeTime = null;
+    });
     return;
   }
   stopAudio();
   const scriptUrl = document.querySelector('script[src*="script.js"]')?.src || document.baseURI;
-  activeAudio = new Audio(new URL(url, scriptUrl).href);
+  const audio = new Audio(new URL(url, scriptUrl).href);
+  activeAudio = audio;
   activeAudio.preload = "metadata";
   activeButton = button;
   activeProgress = progress;
   activeTime = time;
-  button.dataset.idle = button.textContent;
+  if (!button.dataset.idle) button.dataset.idle = button.textContent;
   button.textContent = "Pause";
   button.setAttribute("aria-pressed", "true");
   activeAudio.addEventListener("loadedmetadata", () => {
-    if (!activeAudio) return;
-    const duration = Math.min(activeAudio.duration || 30, 30);
+    if (activeAudio !== audio) return;
+    const duration = Math.min(audio.duration || 30, 30);
     progress.max = duration;
     time.textContent = `0:00 / ${formatTime(duration, true)}`;
   }, { once: true });
   activeAudio.addEventListener("timeupdate", () => {
-    if (!activeAudio) return;
-    const duration = Math.min(activeAudio.duration || 30, 30);
-    progress.value = Math.min(activeAudio.currentTime, duration);
-    time.textContent = `${formatTime(activeAudio.currentTime)} / ${formatTime(duration, true)}`;
-    if (activeAudio.currentTime >= 30) stopAudio();
+    if (activeAudio !== audio) return;
+    const duration = Math.min(audio.duration || 30, 30);
+    progress.value = Math.min(audio.currentTime, duration);
+    time.textContent = `${formatTime(audio.currentTime)} / ${formatTime(duration, true)}`;
+    if (audio.currentTime >= 30) stopAudio();
   });
-  activeAudio.addEventListener("ended", stopAudio, { once: true });
-  activeAudio.play().catch(() => { button.textContent = "Unavailable"; activeAudio = null; activeButton = null; });
+  activeAudio.addEventListener("ended", () => { if (activeAudio === audio) stopAudio(); }, { once: true });
+  activeAudio.play().catch(() => {
+    if (activeAudio !== audio) return;
+    button.textContent = button.dataset.idle || "Play";
+    button.setAttribute("aria-pressed", "false");
+    activeAudio = null;
+    activeButton = null;
+    activeProgress = null;
+    activeTime = null;
+  });
 }
 
 function audioButton(url, label = "Play", title = "audio") {
