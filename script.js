@@ -26,7 +26,7 @@ const SITE_DATA = {
       { number: 9, title: "Onna Flo", feature: "", previewUrl: "", links: {
         spotify: "https://open.spotify.com/album/5kWoqL24PrfVmpdxXvw3Uu",
         appleMusic: "https://music.apple.com/us/album/onna-flo-single/6799945470",
-        amazon: "http://www.amazon.com/gp/product/B0HDQ785SW"
+        amazon: "https://www.amazon.com/gp/product/B0HDQ785SW"
       } },
       { number: 10, title: "Free The Gang", feature: "", previewUrl: "assets/audio/project-previews/free-the-gang-preview.mp3" }
     ]
@@ -56,7 +56,7 @@ const SITE_DATA = {
     { title: "Onna Flo", cover: "assets/artwork/releases/onna-flo.jpg", links: {
       spotify: "https://open.spotify.com/album/5kWoqL24PrfVmpdxXvw3Uu",
       appleMusic: "https://music.apple.com/us/album/onna-flo-single/6799945470",
-      amazon: "http://www.amazon.com/gp/product/B0HDQ785SW"
+      amazon: "https://www.amazon.com/gp/product/B0HDQ785SW"
     } },
     { title: "I Ain’t Say That", cover: "assets/artwork/releases/i-aint-say-that.jpg", links: {
       spotify: "https://open.spotify.com/track/677gZd1G8dXgJZSkLyHsHB",
@@ -89,7 +89,10 @@ function formatTime(value, round = false) {
 
 function stopAudio() {
   if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; }
-  if (activeButton) activeButton.textContent = activeButton.dataset.idle || "Play";
+  if (activeButton) {
+    activeButton.textContent = activeButton.dataset.idle || "Play";
+    activeButton.setAttribute("aria-pressed", "false");
+  }
   if (activeProgress) activeProgress.value = 0;
   if (activeTime) activeTime.textContent = "0:00 / 0:30";
   activeAudio = null;
@@ -100,7 +103,18 @@ function stopAudio() {
 
 function playPreview(url, button, progress, time) {
   if (!url) return;
-  if (activeButton === button && activeAudio && !activeAudio.paused) { stopAudio(); return; }
+  if (activeButton === button && activeAudio) {
+    if (!activeAudio.paused) {
+      activeAudio.pause();
+      button.textContent = button.dataset.idle || "Play";
+      button.setAttribute("aria-pressed", "false");
+      return;
+    }
+    button.textContent = "Pause";
+    button.setAttribute("aria-pressed", "true");
+    activeAudio.play().catch(() => { button.textContent = "Unavailable"; stopAudio(); });
+    return;
+  }
   stopAudio();
   const scriptUrl = document.querySelector('script[src*="script.js"]')?.src || document.baseURI;
   activeAudio = new Audio(new URL(url, scriptUrl).href);
@@ -110,6 +124,7 @@ function playPreview(url, button, progress, time) {
   activeTime = time;
   button.dataset.idle = button.textContent;
   button.textContent = "Pause";
+  button.setAttribute("aria-pressed", "true");
   activeAudio.addEventListener("loadedmetadata", () => {
     if (!activeAudio) return;
     const duration = Math.min(activeAudio.duration || 30, 30);
@@ -127,7 +142,7 @@ function playPreview(url, button, progress, time) {
   activeAudio.play().catch(() => { button.textContent = "Unavailable"; activeAudio = null; activeButton = null; });
 }
 
-function audioButton(url, label = "Play") {
+function audioButton(url, label = "Play", title = "audio") {
   const control = document.createElement("div");
   control.className = "audio-control";
   const button = document.createElement("button");
@@ -135,9 +150,12 @@ function audioButton(url, label = "Play") {
   button.type = "button";
   button.textContent = url ? label : "Pending";
   button.disabled = !url;
+  button.setAttribute("aria-label", url ? `${label} ${title}` : `${title} preview unavailable`);
+  button.setAttribute("aria-pressed", "false");
   if (!url) control.classList.add("pending");
   const progress = document.createElement("progress");
   progress.className = "audio-progress";
+  progress.setAttribute("aria-label", `${title} progress`);
   progress.max = 30;
   progress.value = 0;
   const time = document.createElement("time");
@@ -180,7 +198,7 @@ function renderTracklist() {
       details.appendChild(actions);
     }
     item.innerHTML = `<span>${String(track.number || index + 1).padStart(2, "0")}</span>`;
-    const preview = track.previewUrl ? audioButton(track.previewUrl) : document.createElement("span");
+    const preview = track.previewUrl ? audioButton(track.previewUrl, "Play", `${track.title} preview`) : document.createElement("span");
     if (!track.previewUrl) { preview.className = streamLinks.length ? "preview-status" : "preview-empty"; preview.textContent = streamLinks.length ? "Out now" : "—"; }
     item.append(details, preview);
     list.appendChild(item);
@@ -240,23 +258,35 @@ function beatRow(beat) {
   const formatLabels = Object.entries(beat.formats || {}).filter(([, available]) => available).map(([format]) => format.toUpperCase());
   info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${formatLabels.join(" · ") || "Format pending"}</p>`;
   item.append(info);
-  const firstPrice = beat.price || (beat.licenses || []).find(license => license.price)?.price || "—";
+  const firstPrice = beat.price || (beat.licenses || []).find(license => license.price)?.price || (beat.exclusiveContact ? "$400" : "—");
   [beat.bpm || "—", beat.key || "—", firstPrice].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
-  item.appendChild(audioButton(beat.previewUrl || ""));
+  item.appendChild(audioButton(beat.previewUrl || "", "Play", `${beat.title || "Beat"} preview`));
   if ((beat.licenses || []).length || beat.exclusiveContact) {
     const actions = document.createElement("div");
     actions.className = "beat-actions";
     (beat.licenses || []).forEach(license => {
-      const action = document.createElement(license.buyUrl ? "a" : "span");
-      if (license.buyUrl) action.href = license.buyUrl;
-      else action.setAttribute("aria-disabled", "true");
+      const action = document.createElement("a");
+      action.href = license.buyUrl || beatLicenseInquiryUrl(beat, license);
       action.textContent = `${license.name}${license.price ? ` · ${license.price}` : ""}`;
       actions.appendChild(action);
     });
-    if (beat.exclusiveContact) actions.insertAdjacentHTML("beforeend", `<a href="mailto:contact@808brando.com?subject=${encodeURIComponent(`${beat.title || "Beat"} — Exclusive inquiry`)}">Exclusive · $400</a>`);
+    if (beat.exclusiveContact) {
+      const exclusive = { name: "Exclusive", price: "$400", buyUrl: "" };
+      actions.insertAdjacentHTML("beforeend", `<a href="${beatLicenseInquiryUrl(beat, exclusive)}">Exclusive · $400</a>`);
+    }
     item.appendChild(actions);
   }
   return item;
+}
+
+function beatLicenseInquiryUrl(beat, license) {
+  const labels = { "MP3 LEASE": "MP3 Lease", "WAV LEASE": "WAV Lease", Exclusive: "Exclusive" };
+  const licenseName = labels[license.name] || license.name;
+  const beatName = beat.title || "Beat";
+  const price = license.price || "Price pending";
+  const subject = `${beatName} — ${licenseName} — ${price}`;
+  const body = `Beat: ${beatName}\nLicense: ${licenseName}\nPrice: ${price}\n\nPlease confirm availability and payment instructions.`;
+  return `mailto:${SITE_DATA.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
 function renderBeatPreview() {
@@ -276,6 +306,10 @@ function renderBeatStore() {
   if (!SITE_DATA.beats.length) {
     document.querySelector("#beat-search").disabled = true;
     moodSelect.disabled = true;
+  }
+  if (!moods.length) {
+    moodSelect.closest("label").hidden = true;
+    document.querySelector(".store-filters").classList.add("single-filter");
   }
   moods.forEach(mood => moodSelect.insertAdjacentHTML("beforeend", `<option value="${mood}">${mood}</option>`));
   const applyFilters = () => {
@@ -342,7 +376,7 @@ function setupReveal() {
 }
 
 if (page === "home") {
-  renderTracklist(); renderUpcoming(); renderReleases(); setupForms();
+  renderTracklist(); renderReleases(); setupForms();
   document.querySelector("#brando-release-date").textContent = SITE_DATA.primaryProject.releaseDate || "Release date pending";
 }
 if (page === "beats") renderBeatStore();
