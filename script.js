@@ -210,6 +210,7 @@ function renderTracklist() {
     const details = document.createElement("div");
     details.className = "track-info";
     const streamLinks = Object.entries(track.links || {}).filter(([service, url]) => url && ["spotify", "appleMusic"].includes(service));
+    if (streamLinks.length) item.classList.add("has-streams");
     details.innerHTML = `<strong>${track.title || "Title pending"}</strong>${track.feature ? `<small>feat. ${track.feature}</small>` : ""}`;
     if (streamLinks.length) {
       const actions = document.createElement("div");
