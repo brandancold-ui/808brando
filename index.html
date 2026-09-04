@@ -4,18 +4,68 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#050505" />
-    <meta name="description" content="Official 808 Brando website. Music, releases, beats, and contact." />
+    <meta name="description" content="Official 808 Brando website. Music, the upcoming BRANDO project, beats, and business contact." />
     <link rel="canonical" href="https://808brando.com/" />
     <meta property="og:title" content="808 Brando — Official Website" />
-    <meta property="og:description" content="Music, releases, beats, and contact." />
+    <meta property="og:description" content="Music, the upcoming BRANDO project, production, beats, and business contact." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://808brando.com/" />
     <meta property="og:image" content="https://808brando.com/4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" />
+    <meta property="og:image:alt" content="Official BRANDO project artwork" />
     <meta name="twitter:card" content="summary_large_image" />
     <title>808 Brando — Official Website</title>
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="styles.css?v=20260902g" />
-    <script src="script.js?v=20260902g" defer></script>
+    <link rel="stylesheet" href="styles.css?v=20260904a" />
+    <script src="script.js?v=20260904a" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "MusicGroup",
+            "@id": "https://808brando.com/#artist",
+            "name": "808 Brando",
+            "url": "https://808brando.com/",
+            "image": "https://808brando.com/4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png",
+            "email": "contact@808brando.com",
+            "sameAs": [
+              "https://www.instagram.com/808brando_",
+              "https://open.spotify.com/artist/403LEb2BrQdkKDsTrq62Lx",
+              "https://music.apple.com/us/artist/808-brando/1687278750"
+            ]
+          },
+          {
+            "@type": "MusicAlbum",
+            "@id": "https://808brando.com/#brando",
+            "name": "BRANDO",
+            "byArtist": { "@id": "https://808brando.com/#artist" },
+            "image": "https://808brando.com/4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png",
+            "sameAs": "https://music.apple.com/us/album/brando/6806829619"
+          },
+          {
+            "@type": "MusicRecording",
+            "name": "S.S.",
+            "byArtist": { "@id": "https://808brando.com/#artist" },
+            "image": "https://808brando.com/assets/artwork/releases/ss.jpg",
+            "sameAs": ["https://open.spotify.com/album/2t7cqE5mZXSqU1u0Qgn9qJ", "https://music.apple.com/us/album/ss-single/6772166511"]
+          },
+          {
+            "@type": "MusicRecording",
+            "name": "Onna Flo",
+            "byArtist": { "@id": "https://808brando.com/#artist" },
+            "image": "https://808brando.com/assets/artwork/releases/onna-flo.jpg",
+            "sameAs": ["https://open.spotify.com/album/5kWoqL24PrfVmpdxXvw3Uu", "https://music.apple.com/us/album/onna-flo-single/6799945470"]
+          },
+          {
+            "@type": "MusicRecording",
+            "name": "I Ain’t Say That",
+            "byArtist": { "@id": "https://808brando.com/#artist" },
+            "image": "https://808brando.com/assets/artwork/releases/i-aint-say-that.jpg",
+            "sameAs": ["https://open.spotify.com/track/677gZd1G8dXgJZSkLyHsHB", "https://music.apple.com/us/album/i-aint-say-that/1697637272?i=1697637273"]
+          }
+        ]
+      }
+    </script>
   </head>
   <body data-page="home">
     <a class="skip-link" href="#main">Skip to music</a>
@@ -23,19 +73,32 @@
       <a class="mini-mark" href="#top" aria-label="808 Brando home">808 Brando</a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="sr-only">Open menu</span><span></span><span></span></button>
       <nav class="site-nav" id="site-nav" aria-label="Primary navigation">
-        <a href="#music">Music</a><a href="beats/">Beats</a><a href="#contact">Contact</a>
+        <a href="#music">Music</a><a href="epk/">EPK</a><a href="beats/">Beats</a><a href="#contact">Contact</a>
       </nav>
     </header>
 
     <main id="main">
       <section class="primary-project" id="music" aria-labelledby="brando-title">
         <p class="artist-name">808 Brando</p>
+        <div class="desktop-project-brief" aria-label="BRANDO project summary">
+          <div><strong>“BRANDO”</strong><span>NOVEMBER 1</span></div>
+          <div class="project-actions">
+            <div class="project-preview" data-project-preview></div>
+            <a class="action" data-presave hidden>Pre-save BRANDO</a>
+            <a class="action" href="mailto:contact@808brando.com?subject=808%20Brando%20%E2%80%94%20Business%20Inquiry">Contact 808 Brando</a>
+          </div>
+        </div>
         <div class="project-grid">
           <div class="project-visual">
             <figure class="primary-cover"><img src="4C8C915B-4C05-4F03-BF55-5BFD5AE3C4B6.png" alt="Official BRANDO artwork featuring 808 Brando and his mother" /></figure>
             <div class="primary-release reveal">
               <h1 id="brando-title">“BRANDO”</h1>
               <p id="brando-release-date" class="release-date">NOVEMBER 1</p>
+              <div class="project-actions" aria-label="BRANDO project actions">
+                <div class="project-preview" data-project-preview></div>
+                <a class="action" data-presave hidden>Pre-save BRANDO</a>
+                <a class="action" href="mailto:contact@808brando.com?subject=808%20Brando%20%E2%80%94%20Business%20Inquiry">Contact 808 Brando</a>
+              </div>
             </div>
           </div>
           <div class="tracklist-shell reveal" aria-labelledby="tracklist-title">
@@ -57,13 +120,13 @@
       <section class="contact" id="contact" aria-labelledby="contact-title">
         <header class="split-heading reveal"><div><h2 id="contact-title">Contact</h2></div></header>
         <div class="contact-direct reveal">
-          <div class="contact-types" aria-label="Contact purposes"><span>Features</span><span>Beats</span><span>Booking</span><span>Business</span></div>
-          <a class="contact-email" href="mailto:contact@808brando.com">contact@808brando.com</a>
+          <div class="contact-types" aria-label="Contact purposes"><span>Artist Opportunities</span><span>Production</span><span>Features</span><span>Booking</span><span>Management</span><span>Partnerships</span><span>Beat Licensing</span></div>
+          <a class="contact-email" href="mailto:contact@808brando.com?subject=808%20Brando%20%E2%80%94%20Business%20Inquiry">contact@808brando.com</a>
         </div>
       </section>
 
     </main>
 
-    <footer class="site-footer"><a href="#top" class="footer-mark">808 Brando</a><nav aria-label="Artist links"><a href="https://www.instagram.com/808brando_" target="_blank" rel="noopener">Instagram</a><a href="https://open.spotify.com/artist/403LEb2BrQdkKDsTrq62Lx" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/artist/808-brando/1687278750" target="_blank" rel="noopener">Apple Music</a></nav><p>© <span id="year"></span> 808 Brando</p></footer>
+    <footer class="site-footer"><a href="#top" class="footer-mark">808 Brando</a><nav aria-label="Artist links"><a href="epk/">EPK</a><a href="mailto:contact@808brando.com?subject=808%20Brando%20%E2%80%94%20Business%20Inquiry">Contact</a><a href="https://www.instagram.com/808brando_" target="_blank" rel="noopener">Instagram</a><a href="https://open.spotify.com/artist/403LEb2BrQdkKDsTrq62Lx" target="_blank" rel="noopener">Spotify</a><a href="https://music.apple.com/us/artist/808-brando/1687278750" target="_blank" rel="noopener">Apple Music</a></nav><p>© <span id="year"></span> 808 Brando</p></footer>
   </body>
 </html>

@@ -7,6 +7,7 @@
 const SITE_DATA = {
   contactEmail: "contact@808brando.com",
   licenseTermsUrl: "https://808brando.com/license/",
+  presaveUrl: "https://music.apple.com/us/album/brando/6806829619",
   signupUrl: "", // Add a future mailing-list form URL or endpoint.
   primaryProject: {
     title: "BRANDO",
@@ -253,6 +254,27 @@ function platformLabel(key) {
   return { appleMusic: "Apple Music", spotify: "Spotify", amazon: "Amazon", youtube: "YouTube", other: "More" }[key] || key;
 }
 
+function siteAssetUrl(path) {
+  const scriptUrl = document.querySelector('script[src*="script.js"]')?.src || document.baseURI;
+  return new URL(path, new URL(".", scriptUrl)).href;
+}
+
+function renderProjectActions() {
+  const preview = SITE_DATA.primaryProject.tracks.find(track => track.title === "Free The Gang")?.previewUrl || "";
+  document.querySelectorAll("[data-project-preview]").forEach(target => {
+    const control = audioButton(preview, "Preview BRANDO", "BRANDO project preview");
+    control.classList.add("project-preview-control");
+    target.appendChild(control);
+  });
+  document.querySelectorAll("[data-presave]").forEach(link => {
+    if (!SITE_DATA.presaveUrl) { link.remove(); return; }
+    link.href = SITE_DATA.presaveUrl;
+    link.hidden = false;
+    link.target = "_blank";
+    link.rel = "noopener";
+  });
+}
+
 function renderReleases() {
   const grid = document.querySelector("#release-grid");
   if (!grid) return;
@@ -261,7 +283,7 @@ function renderReleases() {
     const item = document.createElement("article");
     item.className = "release-card reveal";
     item.style.setProperty("--reveal-delay", `${index * 70}ms`);
-    item.innerHTML = `<img src="${release.cover}" alt="Official ${release.title || "release"} cover artwork" loading="lazy" width="632" height="632"><h3>${release.title || "Title pending"}</h3>`;
+    item.innerHTML = `<img src="${siteAssetUrl(release.cover)}" alt="Official ${release.title || "release"} cover artwork" loading="lazy" width="632" height="632"><h3>${release.title || "Title pending"}</h3>`;
     const links = document.createElement("div");
     links.className = "stream-links";
     Object.entries(release.links || {}).filter(([, url]) => url).forEach(([service, url]) => links.insertAdjacentHTML("beforeend", `<a href="${url}" target="_blank" rel="noopener">${platformLabel(service)} ↗</a>`));
@@ -279,7 +301,7 @@ function beatRow(beat, index = 0) {
   const info = document.createElement("div");
   info.className = "beat-title";
   const formatLabels = Object.entries(beat.formats || {}).filter(([, available]) => available).map(([format]) => format.toUpperCase());
-  info.innerHTML = `<h3>${beat.title || "Title pending"}</h3><p>${formatLabels.join(" · ") || "Format pending"}</p>`;
+  info.innerHTML = `<h3>${beat.title || "Title pending"}</h3>${formatLabels.length ? `<p>${formatLabels.join(" · ")}</p>` : ""}`;
   item.append(info);
   const firstPrice = beat.price || (beat.licenses || []).find(license => license.price)?.price || (beat.exclusiveContact ? "$400" : "—");
   [beat.bpm || "—", beat.key || "—", firstPrice].forEach(value => { const span = document.createElement("span"); span.textContent = value; item.appendChild(span); });
@@ -412,10 +434,11 @@ function setupReveal() {
 }
 
 if (page === "home") {
-  renderTracklist(); renderReleases(); setupForms();
+  renderTracklist(); renderReleases(); renderProjectActions(); setupForms();
   document.querySelector("#brando-release-date").textContent = SITE_DATA.primaryProject.releaseDate || "Release date pending";
 }
 if (page === "beats") renderBeatStore();
+if (page === "epk") { renderReleases(); renderProjectActions(); }
 document.querySelectorAll("#year").forEach(element => { element.textContent = new Date().getFullYear(); });
 setupNavigation();
 setupHeader();
